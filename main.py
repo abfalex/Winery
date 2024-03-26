@@ -52,7 +52,7 @@ def update_page(wines):
         file.write(rendered_page)
 
 
-wines = read_data_from_excel("wine3.xlsx")
+wines = read_data_from_excel("wine.xlsx")
 
 update_page(wines)
 
