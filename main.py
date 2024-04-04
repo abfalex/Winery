@@ -6,20 +6,6 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-WINERY_FOUNDATION_YEAR = 1920
-TEMPLATE_FILE = "template.html"
-
-parser = argparse.ArgumentParser(
-    prog='Winery'
-)
-
-parser.add_argument(
-    'wine_file',
-    type=str,
-    default="wine.xlsx",
-    help='Укажите excel-файл с винами',
-)
-
 
 def winery_age_format_handler(winery_age):
     delta_new = winery_age % 100
@@ -61,17 +47,30 @@ def update_page(wines, winery_age, template):
 
 
 def main():
+    winery_foundation_year = 1920
+
     env = Environment(
         loader=FileSystemLoader("."),
         autoescape=select_autoescape(["html", "xml"])
     )
 
+    parser = argparse.ArgumentParser(
+        prog='Winery'
+    )
+
+    parser.add_argument(
+        'wine_file',
+        type=str,
+        default="wine.xlsx",
+        help='Укажите excel-файл с винами',
+    )
+
     args = parser.parse_args()
     wines_path = args.wine_file
 
-    template = env.get_template(TEMPLATE_FILE)
+    template = env.get_template("template.html")
 
-    winery_age = datetime.now().year - WINERY_FOUNDATION_YEAR
+    winery_age = datetime.now().year - winery_foundation_year
     wines = read_data_from_excel(wines_path)
 
     update_page(wines, winery_age, template)
