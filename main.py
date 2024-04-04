@@ -1,22 +1,27 @@
 import pandas
 import collections
+import argparse
 
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from pprint import pprint
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-env = Environment(
-    loader=FileSystemLoader("."),
-    autoescape=select_autoescape(["html", "xml"])
+WINERY_FOUNDATION_YEAR = 1920
+TEMPLATE_FILE = "template.html"
+
+parser = argparse.ArgumentParser(
+    prog='Winery'
 )
 
-template = env.get_template("template.html")
+parser.add_argument(
+    'wine_file',
+    type=str,
+    default="wine.xlsx",
+    help='Укажите excel-файл с винами',
+)
 
-winery_age = datetime.now().year - 1920
 
-
-def formatted_year_handler():
+def winery_age_format_handler(winery_age):
     delta_new = winery_age % 100
 
     if 21 > delta_new > 4:
@@ -36,25 +41,44 @@ def read_data_from_excel(file_path):
     return pandas.read_excel(file_path).fillna("").to_dict(orient="records")
 
 
-def update_page(wines):
+def update_page(wines, winery_age, template):
     categories = collections.defaultdict(list)
+
+    formatted_winery_age = winery_age_format_handler(winery_age)
 
     for wine in wines:
         categories[wine['Категория']].append(wine)
 
     rendered_page = template.render(
         categories=categories,
+        wines=wines,
         company_age=winery_age,
-        formatted_year=formatted_year_handler()
+        formatted_winery_age=formatted_winery_age
     )
 
     with open("index.html", "w", encoding="utf8") as file:
         file.write(rendered_page)
 
 
-wines = read_data_from_excel("wine.xlsx")
+def main():
+    env = Environment(
+        loader=FileSystemLoader("."),
+        autoescape=select_autoescape(["html", "xml"])
+    )
 
-update_page(wines)
+    args = parser.parse_args()
+    wines_path = args.wine_file
 
-server = HTTPServer(("0.0.0.0", 8000), SimpleHTTPRequestHandler)
-server.serve_forever()
+    template = env.get_template(TEMPLATE_FILE)
+
+    winery_age = datetime.now().year - WINERY_FOUNDATION_YEAR
+    wines = read_data_from_excel(wines_path)
+
+    update_page(wines, winery_age, template)
+
+    server = HTTPServer(("0.0.0.0", 8000), SimpleHTTPRequestHandler)
+    server.serve_forever()
+
+
+if __name__ == "__main__":
+    main()
