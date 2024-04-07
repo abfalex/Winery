@@ -7,7 +7,7 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
-def winery_age_format_handler(winery_age):
+def format_winery_age(winery_age):
     delta_new = winery_age % 100
 
     if 21 > delta_new > 4:
@@ -30,7 +30,7 @@ def read_data_from_excel(file_path):
 def update_page(wines, winery_age, template):
     categories = collections.defaultdict(list)
 
-    formatted_winery_age = winery_age_format_handler(winery_age)
+    formatted_winery_age = format_winery_age(winery_age)
 
     for wine in wines:
         categories[wine['Категория']].append(wine)
@@ -59,7 +59,7 @@ def main():
     )
 
     parser.add_argument(
-        'wine_file',
+        '--wine_file',
         type=str,
         default="wine.xlsx",
         help='Укажите excel-файл с винами',
