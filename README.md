@@ -19,7 +19,7 @@ cd Winery
 3. Создайте и активируйте виртуальное окружение (опционально):
 
 ```bash
-python3 -m venv venv_name
+python3 -m venv venv
 source venv/bin/activate
 ```
 
@@ -34,10 +34,10 @@ pip install -r requirements.txt
 Запустите приложение с помощью команды:
 
 ```bash
-python3 main.py --wine_file <wine_file>
+python3 main.py [wine_file]
 ```
 
-Введя `--wine_file`, допишите путь к excel-файлу с винами (смотрите пункт "Подготовка данных" ниже).
+Вместо `wine_file` используйте путь к excel-файлу с винами (смотрите пункт "Подготовка данных" ниже).
 
 После этого приложение будет доступно по адресу http://localhost:8000/
 
